@@ -1,0 +1,30 @@
+{
+  "name": "express-json-api",
+  "version": "1.0.0",
+  "description": "Exercise to create an Express server to serve JSON",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "babel-node": "babel-node --stage-0 --ignore='foo|bar|baz'"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.13.3",
+    "express-api-queryhandler": "^0.4.2"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.2.0",
+    "babel-core": "^6.2.1",
+    "babel-istanbul": "^0.5.9",
+    "babel-plugin-syntax-async-functions": "^6.1.18",
+    "babel-plugin-transform-regenerator": "^6.2.0",
+    "babel-polyfill": "^6.2.0",
+    "babel-preset-es2015": "^6.1.18",
+    "chai": "^3.4.1",
+    "codecov.io": "^0.1.6",
+    "mocha": "^2.3.4",
+    "mocha-lcov-reporter": "^1.0.0",
+    "nodemon": "^1.8.1"
+  }
+}
