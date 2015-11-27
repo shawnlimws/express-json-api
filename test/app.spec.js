@@ -41,7 +41,7 @@ describe('/GET /?name', () => {
       .end(done)
   })
   it('should respond with NOT_FOUND if the name is not in the data', done => {
-    request(app).get('/daslasdf')
+    request(app).get('/?name=daslasdf')
       .expect(NOT_FOUND)
       .end(done)
   })
