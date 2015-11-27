@@ -3,7 +3,6 @@ import 'babel-polyfill'
 import data from './data.json'
 import express from 'express'
 import includes from 'lodash.includes'
-import sortBy from 'lodash.sortBy'
 import pick from 'lodash.pick'
 
 const app = express()
