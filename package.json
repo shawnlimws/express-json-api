@@ -4,8 +4,9 @@
   "description": "Exercise to create an Express server to serve JSON",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "babel-node": "babel-node --stage-0 --ignore='foo|bar|baz'"
+    "test": "mocha --require babel-core/register --watch",
+    "babel-node": "babel-node --presets es2015 --ignore='foo|bar|baz'",
+    "start": "node src/server.js"
   },
   "author": "",
   "license": "ISC",
@@ -25,6 +26,7 @@
     "codecov.io": "^0.1.6",
     "mocha": "^2.3.4",
     "mocha-lcov-reporter": "^1.0.0",
-    "nodemon": "^1.8.1"
+    "nodemon": "^1.8.1",
+    "supertest": "^1.1.0"
   }
 }

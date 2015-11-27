@@ -6,43 +6,57 @@ import queryHandler from 'express-api-queryhandler'
 import includes from 'lodash.includes'
 import sortBy from 'lodash.sortBy'
 import pick from 'lodash.pick'
-import fs from 'fs'
 
 const app = express()
+let participants = data.instructors.concat(data.students)
 
-// app.use(queryHandler.fields())
+app.use(queryHandler.fields())
 
 app.get('/', function (req, res) {
-  res.send(data.students)
-  console.log(data)
+  res.json(participants)
 })
 
 app.get('/:name', function (req, res) {
-  const response = data.students.filter(student => {
+  const response = participants.filter(student => {
     return includes(student.name.toLowerCase().split(' '), req.params.name.toLowerCase())
   })
-  const sortedResponse = sortBy(response, student => student.name)
+  const sortedResponse = response.sort((a, b) => a.name.localeCompare(b.name))
   const matchedResponse = sortedResponse.map(student => {
-    return req.query.keys ? pick(student, req.query.keys) : student
+    return req.fields ? pick(student, req.fields.split(' ')) : student
   })
-  res.send(matchedResponse)
+  if (matchedResponse.length > 0) {
+    res.json(matchedResponse)
+  } else {
+    res.status(404)
+      .send('Not Found')
+  }
+
 })
 
-app.post('/new', function (req, res) {
-  console.log(data.students)
-  const newStudent = {
+app.get('/new', function (req, res) {
+  // create form
+
+})
+app.post('/create', function (req, res) {
+  const newPerson = {
     name: req.query.name,
     title: req.query.title
   }
-  [data.students].append(newStudent)
-  res.send(data.students)
+  participants.push(newPerson)
+  res.status(200).send('New person added', newPerson)
+})
+
+app.put('/update/:name', function (req, res) {
+  const update = {
+    name: req.query.name,
+    title: req.query.title
+  }
+})
+
+app.delete('/delete/:name', function (req, res) {
+
 })
 
 app.use(express.static('public'))
 
-var server = app.listen(3000, function () {
-  const host = server.address().address
-  const port = server.address().port
-
-  console.log('App listening at http://%s:%s', host, port)
-})
+export default app
