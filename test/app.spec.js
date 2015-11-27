@@ -30,9 +30,9 @@ describe('/GET /', () => {
   })
 })
 
-describe('/GET /:name', () => {
+describe('/GET /?name', () => {
   it('should respond with participants whose name is in the URL', done => {
-    request(app).get('/albert')
+    request(app).get('/?name=albert')
       .expect(res => {
         res.body.every(person => {
           expect(person.name.toLowerCase().split(' ')).to.contain('albert')
@@ -45,8 +45,11 @@ describe('/GET /:name', () => {
       .expect(NOT_FOUND)
       .end(done)
   })
-  it('should provide a response sorted by name', done => {
-    request(app).get('/tan')
+})
+
+describe('/GET /?sorted=true', () => {
+  it('should provide a response sorted by name if sorted is true', done => {
+    request(app).get('/?name=tan&sorted=true')
       .expect('Content-Type', /json/)
       .expect(res => {
         expect(res).to.satisfy(res => {
@@ -57,9 +60,9 @@ describe('/GET /:name', () => {
   })
 })
 
-describe('/GET /:name with whitelisted keys', () => {
+describe('/GET /?filter=:keys', () => {
   it('should provide only whitelisted keys', done => {
-    request(app).get('/albert?fields=name,imagePath')
+    request(app).get('/?name=albert&filter=name,imagePath')
       .expect('Content-Type', /json/)
       .expect(res => {
         res.body.every(person => {
@@ -71,3 +74,38 @@ describe('/GET /:name with whitelisted keys', () => {
 })
 
 // tests for CRUD
+describe('/POST /create?name=:name', () => {
+  it('should create a new person object and respond with the object', done => {
+    const newPerson = {
+      name: 'John Doe',
+      title: 'Ghost'
+    }
+    request(app).post('/create?name=' + newPerson.name + '&title=' + newPerson.title)
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .expect(res => {
+        expect(res.body).to.deep.equal(newPerson)
+      })
+      .end(done)
+  })
+  it('should append the new person the database', done => {
+    done()
+  })
+})
+
+describe('/UPDATE /update?:name&?:properties', () => {
+  it('should update a person object with the new properties and return the updated object', done => {
+    // const personName = 'Your Name Here'
+    // const updateValues = {
+    //   title: 'Super Student',
+    //   github: 'superstudent'
+    // }
+    done()
+  })
+})
+
+describe('/DELETE /delete?:name', () => {
+  it('should delete a person object by name', done => {
+    done()
+  })
+})
