@@ -2,6 +2,7 @@ import app from '../src/app.js'
 import includes from 'lodash.includes'
 import chai from 'chai'
 import request from 'supertest'
+import querystring from 'querystring'
 
 const expect = chai.expect
 const NOT_FOUND = 404
@@ -75,12 +76,14 @@ describe('/GET /?filter=:keys', () => {
 
 // tests for CRUD
 describe('/POST /create?name=:name', () => {
+  const agent = request.agent(app)
+  const newPerson = {
+    name: 'John Doe',
+    title: 'Ghost'
+  }
+  const queryString = querystring.stringify(newPerson)
   it('should create a new person object and respond with the object', done => {
-    const newPerson = {
-      name: 'John Doe',
-      title: 'Ghost'
-    }
-    request(app).post('/create?name=' + newPerson.name + '&title=' + newPerson.title)
+    agent.post('/create?' + queryString)
       .expect('Content-Type', /json/)
       .expect(200)
       .expect(res => {
@@ -89,23 +92,75 @@ describe('/POST /create?name=:name', () => {
       .end(done)
   })
   it('should append the new person the database', done => {
-    done()
+    agent.get('/')
+      .expect(res => {
+        const testPerson = res.body.find(el => el.name === newPerson.name)
+        expect(testPerson).to.exist
+        for (const prop in newPerson) {
+          expect(testPerson[prop]).to.equal(newPerson[prop])
+        }
+      })
+      .end(done)
   })
 })
 
-describe('/UPDATE /update?:name&?:properties', () => {
-  it('should update a person object with the new properties and return the updated object', done => {
-    // const personName = 'Your Name Here'
-    // const updateValues = {
-    //   title: 'Super Student',
-    //   github: 'superstudent'
-    // }
-    done()
+describe('/UPDATE /update?:name&?:properties...', () => {
+  const agent = request.agent(app)
+  const updatePerson = {
+    name: 'Sebastiaan Deckers',
+    title: 'Ninja',
+    address: 'Keong Saik Road',
+    age: 99
+  }
+  const queryString = querystring.stringify(updatePerson)
+
+  it('should return OK', done => {
+    agent.put('/update?' + queryString)
+      .expect(OK)
+      .end(done)
+  })
+  it('should return a person with updated properties', done => {
+    agent.put('/update?' + queryString)
+      .expect(res => {
+        expect(res.body).to.contain.all.keys(Object.keys(updatePerson))
+        for (const prop in updatePerson) {
+          expect(res.body[prop]).to.equal(updatePerson[prop])
+        }
+      })
+      .end(done)
+  })
+  it('should return a complete list of participants with new properties', done => {
+    agent.get('/')
+      .expect(res => {
+        const testPerson = res.body.find(el => el.name === updatePerson.name)
+        expect(testPerson).to.exist
+        for (const prop in updatePerson) {
+          expect(testPerson[prop]).to.equal(updatePerson[prop])
+        }
+      })
+      .end(done)
   })
 })
 
 describe('/DELETE /delete?:name', () => {
-  it('should delete a person object by name', done => {
-    done()
+  const agent = request.agent(app)
+  const deletePerson = {
+    name: 'Albert Salim'
+  }
+  it('should return OK', done => {
+    agent.delete('/delete?name=' + deletePerson.name)
+      .expect('Content-Type', /json/)
+      .expect(OK)
+      .end(done)
+  })
+  it('should remove the person from data', done => {
+    agent.get('/')
+      .expect('Content-Type', /json/)
+      .expect(OK)
+      .expect(res => {
+        const names = res.body.map(person => person.name)
+        expect(names).to.not.contain(deletePerson.name)
+      })
+      .end(done)
   })
 })
