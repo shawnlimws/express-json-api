@@ -4,8 +4,9 @@
   "description": "A demo server to create RESTful API using Express",
   "main": "server.js",
   "scripts": {
-    "start": "npm run build && node dist/server.js",
-    "build": "babel src --out-dir dist --presets es2015",
+    "start": "npm run build && npm run start-server",
+    "start-server": "node dist/server.js",
+    "build": "babel src --out-dir dist --presets es2015 && cp src/data.json dist/data.json",
     "babel-node": "babel-node --presets es2015 --ignore='foo|bar|baz'",
     "test": "standard && npm run test:cover",
     "test:cover": "babel-node node_modules/.bin/babel-istanbul cover _mocha",
