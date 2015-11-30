@@ -8,6 +8,7 @@ import querystring from 'querystring'
 const expect = chai.expect
 const NOT_FOUND = 404
 const OK = 200
+const REDIRECT_FOUND = 302
 
 describe('/GET method on /participants', () => {
   it('should respond with JSON data', done => {
@@ -174,6 +175,14 @@ describe('/DELETE method on /participants', () => {
   it('should return NOT FOUND if name is not found', done => {
     agent.delete('/participants?name=Not Found')
       .expect(NOT_FOUND)
+      .end(done)
+  })
+})
+
+describe('/GET method on /', () => {
+  it('should redirect to /participants', done => {
+    request(app).get('/')
+      .expect(REDIRECT_FOUND)
       .end(done)
   })
 })

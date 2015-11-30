@@ -7,6 +7,10 @@ import pick from 'lodash.pick'
 const app = express()
 let participants = data.instructors.concat(data.students)
 
+app.get('/', function (req, res) {
+  res.redirect('/participants')
+})
+
 app.get('/participants', function (req, res) {
   let response
   if (req.query.name) {
