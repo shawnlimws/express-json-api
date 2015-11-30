@@ -2,7 +2,7 @@
   "name": "express-json-api",
   "version": "1.0.0",
   "description": "Exercise to create an Express server to serve JSON",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "babel-node": "babel-node --presets es2015 --ignore='foo|bar|baz'",
     "start": "node src/server.js",

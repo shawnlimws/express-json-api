@@ -8,11 +8,11 @@ import pick from 'lodash.pick'
 const app = express()
 let participants = data.instructors.concat(data.students)
 
-app.get('/', function (req, res) {
+app.get('/participants', function (req, res) {
   let response
   if (req.query.name) {
     response = participants.filter(person => {
-      return includes(person.name.toLowerCase().split(' '), req.query.name.toLowerCase())
+      return person.name.toLowerCase().includes(req.query.name.toLowerCase())
     })
   } else {
     response = participants
@@ -31,30 +31,40 @@ app.get('/', function (req, res) {
   }
 })
 
-app.post('/create', function (req, res) {
-  const newPerson = {
-    name: req.query.name,
-    title: req.query.title
+// /POST /participants?name=fullname?property1=value1?property2=value2
+app.post('/participants', function (req, res) {
+  const newPerson = {}
+  for (const prop in req.query) {
+    newPerson[prop] = !isNaN(req.query[prop]) ? parseInt(req.query[prop], 10) : req.query[prop]
   }
   participants.push(newPerson)
   res.status(200).json(newPerson)
 })
 
-// /update/:fullname?property1=value1?proerty2=value2
-app.put('/update', function (req, res) {
+// /PUT /participants?name=fullname?property1=value1?property2=value2
+app.put('/participants', function (req, res) {
   const updatePerson = participants.find(el => el.name === req.query.name)
   if(updatePerson) {
     for (const prop in req.query) {
       updatePerson[prop] = !isNaN(req.query[prop]) ? parseInt(req.query[prop], 10) : req.query[prop]
     }
+    res.status(200).json(updatePerson)
+  } else {
+    res.status(404).send('NOT FOUND')
   }
-  res.status(200).json(updatePerson)
+
 })
 
-app.delete('/delete', function (req, res) {
+// /DELETE /participants?name=fullname
+app.delete('/participants', function (req, res) {
   const deletePersonIndex = participants.findIndex(el => el.name === req.query.name)
-  participants.splice(deletePersonIndex, 1)
-  res.status(200).json(participants)
+  if(deletePersonIndex >= 0) {
+    // delete participants[deletePersonIndex]
+    participants.splice(deletePersonIndex, 1)
+    res.status(200).json(participants)
+  } else {
+    res.status(404).send('NOT FOUND')
+  }
 })
 
 app.use(express.static('public'))
