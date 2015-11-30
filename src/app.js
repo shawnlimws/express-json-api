@@ -2,7 +2,6 @@ import 'babel-polyfill'
 
 import data from './data.json'
 import express from 'express'
-import includes from 'lodash.includes'
 import pick from 'lodash.pick'
 
 const app = express()
@@ -44,7 +43,7 @@ app.post('/participants', function (req, res) {
 // /PUT /participants?name=fullname?property1=value1?property2=value2
 app.put('/participants', function (req, res) {
   const updatePerson = participants.find(el => el.name === req.query.name)
-  if(updatePerson) {
+  if (updatePerson) {
     for (const prop in req.query) {
       updatePerson[prop] = !isNaN(req.query[prop]) ? parseInt(req.query[prop], 10) : req.query[prop]
     }
@@ -52,13 +51,12 @@ app.put('/participants', function (req, res) {
   } else {
     res.status(404).send('NOT FOUND')
   }
-
 })
 
 // /DELETE /participants?name=fullname
 app.delete('/participants', function (req, res) {
   const deletePersonIndex = participants.findIndex(el => el.name === req.query.name)
-  if(deletePersonIndex >= 0) {
+  if (deletePersonIndex >= 0) {
     // delete participants[deletePersonIndex]
     participants.splice(deletePersonIndex, 1)
     res.status(200).json(participants)
