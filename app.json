@@ -1,0 +1,7 @@
+{
+  "name":"Express JSON API",
+  "description":"A demo server to create RESTful API using Express",
+  "scripts":{},
+  "env":{},
+  "addons":[]
+}
