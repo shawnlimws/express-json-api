@@ -1,5 +1,6 @@
+/* global describe it */
+
 import app from '../src/app.js'
-import includes from 'lodash.includes'
 import chai from 'chai'
 import request from 'supertest'
 import querystring from 'querystring'
