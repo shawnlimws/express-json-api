@@ -1,16 +1,16 @@
 {
   "name": "express-json-api",
   "version": "1.0.0",
-  "description": "Exercise to create an Express server to serve JSON",
+  "description": "A demo server to create RESTful API using Express",
   "main": "server.js",
   "scripts": {
     "babel-node": "babel-node --presets es2015 --ignore='foo|bar|baz'",
-    "start": "node src/server.js",
-    "test": "mocha --require babel-core/register",
+    "start": "babel-node src/server.js",
+    "test": "standard && mocha --require babel-core/register",
     "test:cover": "babel-node node_modules/.bin/babel-istanbul cover _mocha",
     "codecov": "cat ./coverage/coverage.json | ./node_modules/codecov.io/bin/codecov.io.js"
   },
-  "author": "",
+  "author": "Albert Salim",
   "license": "ISC",
   "dependencies": {
     "express": "^4.13.3",
