@@ -1,11 +1,11 @@
 import 'babel-polyfill'
-
-import data from './data.json'
+import fs from 'fs'
+import participants from '../db/data.json'
 import express from 'express'
 import pick from 'lodash.pick'
 
+const db = 'db/data.json'
 const app = express()
-let participants = data.instructors.concat(data.students)
 
 app.get('/', function (req, res) {
   res.redirect('/participants')
@@ -42,6 +42,7 @@ app.post('/participants', function (req, res) {
   }
   participants.push(newPerson)
   res.status(200).json(newPerson)
+  fs.writeFileSync(db, JSON.stringify(participants))
 })
 
 // /PUT /participants?name=fullname?property1=value1?property2=value2
@@ -52,6 +53,7 @@ app.put('/participants', function (req, res) {
       updatePerson[prop] = !isNaN(req.query[prop]) ? parseInt(req.query[prop], 10) : req.query[prop]
     }
     res.status(200).json(updatePerson)
+    fs.writeFileSync(db, JSON.stringify(participants))
   } else {
     res.status(404).send('NOT FOUND')
   }
@@ -64,6 +66,7 @@ app.delete('/participants', function (req, res) {
     // delete participants[deletePersonIndex]
     participants.splice(deletePersonIndex, 1)
     res.status(200).json(participants)
+    fs.writeFileSync(db, JSON.stringify(participants))
   } else {
     res.status(404).send('NOT FOUND')
   }
