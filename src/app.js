@@ -1,77 +1,87 @@
 import 'babel-polyfill'
-import fs from 'fs'
-import participants from '../db/data.json'
 import express from 'express'
-import pick from 'lodash.pick'
+import mongoose from 'mongoose'
+import bodyParser from 'body-parser'
 
-const db = 'db/data.json'
 const app = express()
+const dbUri = 'mongodb://' +
+  process.env.EXPRESSAPI_MONGODB_USER + ':' +
+  process.env.EXPRESSAPI_MONGODB_PASSWORD +
+  '@ds059634.mongolab.com:59634/playground'
+
+mongoose.connect(dbUri)
+
+const Person = mongoose.model('Person', {
+  name: String,
+  title: String,
+  imagePath: String,
+  age: Number,
+  address: String,
+  githubURL: String
+})
+
+app.use(bodyParser.json())
 
 app.get('/', function (req, res) {
   res.redirect('/participants')
 })
 
 app.get('/participants', function (req, res) {
-  let response
-  if (req.query.name) {
-    response = participants.filter(person => {
-      return person.name.toLowerCase().includes(req.query.name.toLowerCase())
-    })
-  } else {
-    response = participants
-  }
-  if (req.query.filter) {
-    response = response.map(person => pick(person, req.query.filter.split(',')))
-  }
-  if (req.query.sorted) {
-    response = response.sort((a, b) => a.name.localeCompare(b.name))
-  }
-  if (response.length > 0) {
-    res.json(response)
-  } else {
-    res.status(404)
-      .send('Not Found')
-  }
-})
-
-// /POST /participants?name=fullname?property1=value1?property2=value2
-app.post('/participants', function (req, res) {
-  const newPerson = {}
-  for (const prop in req.query) {
-    newPerson[prop] = !isNaN(req.query[prop]) ? parseInt(req.query[prop], 10) : req.query[prop]
-  }
-  participants.push(newPerson)
-  res.status(200).json(newPerson)
-  fs.writeFileSync(db, JSON.stringify(participants))
-})
-
-// /PUT /participants?name=fullname?property1=value1?property2=value2
-app.put('/participants', function (req, res) {
-  const updatePerson = participants.find(el => el.name === req.query.name)
-  if (updatePerson) {
-    for (const prop in req.query) {
-      updatePerson[prop] = !isNaN(req.query[prop]) ? parseInt(req.query[prop], 10) : req.query[prop]
+  const query = req.query.name ? { name: { $regex: req.query.name, $options: 'i' } } : {}
+  const projection = req.query.filter ? '-_id ' + req.query.filter.replace(/,/g, ' ') : null
+  const options = req.query.sort ? { sort: { name: 1 } } : null
+  Person.find(query, projection, options, (err, docs) => {
+    if (err) return console.err(err)
+    if (docs.length > 0) {
+      console.log('person found')
+      res.json(docs)
+    } else {
+      console.log('Not Found')
+      res.status(404).end('Not Found')
     }
-    res.status(200).json(updatePerson)
-    fs.writeFileSync(db, JSON.stringify(participants))
-  } else {
-    res.status(404).send('NOT FOUND')
-  }
+  })
 })
 
-// /DELETE /participants?name=fullname
+// /POST /participants to create new Person
+app.post('/participants', function (req, res) {
+  const newPerson = new Person(req.body)
+  newPerson.save(function (err) {
+    if (err) return console.error(err)
+    console.log('new person added')
+    res.json(newPerson)
+  })
+})
+
+// /PUT /participants to update Person
+app.put('/participants', function (req, res) {
+  Person.findOneAndUpdate(
+    { name: req.body.name },
+    req.body,
+    { new: true },
+    (err, doc) => {
+      if (err) return console.error(err)
+      if (doc) {
+        console.log('person updated')
+        res.json(doc)
+      } else {
+        res.status(404).end('Not found')
+      }
+    })
+})
+
+// /DELETE /participants to delete Person
 app.delete('/participants', function (req, res) {
-  const deletePersonIndex = participants.findIndex(el => el.name === req.query.name)
-  if (deletePersonIndex >= 0) {
-    // delete participants[deletePersonIndex]
-    participants.splice(deletePersonIndex, 1)
-    res.status(200).json(participants)
-    fs.writeFileSync(db, JSON.stringify(participants))
-  } else {
-    res.status(404).send('NOT FOUND')
-  }
+  Person.findOneAndRemove(
+    { name: req.body.name },
+    (err, doc) => {
+      if (err) return console.error(err)
+      if (doc) {
+        console.log('person deleted')
+        res.status(200).end()
+      } else {
+        res.status(404).end('Not Found')
+      }
+    })
 })
-
-app.use(express.static('public'))
 
 export default app
