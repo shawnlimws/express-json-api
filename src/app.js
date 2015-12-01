@@ -54,30 +54,34 @@ app.post('/participants', function (req, res) {
 
 // /PUT /participants to update Person
 app.put('/participants', function (req, res) {
-  const updatePerson = req.body
-  Person.findOneAndUpdate({name: updatePerson.name}, updatePerson, (err, doc) => {
-    if (err) return console.error(err)
-    if (doc) {
-      console.log('person updated')
-      res.json(updatePerson)
-    } else {
-      res.status(404).send('Not found')
-    }
-  })
+  Person.findOneAndUpdate(
+    { name: req.body.name },
+    req.body,
+    { new: true },
+    (err, doc) => {
+      if (err) return console.error(err)
+      if (doc) {
+        console.log('person updated')
+        res.json(doc)
+      } else {
+        res.status(404).send('Not found')
+      }
+    })
 })
 
 // /DELETE /participants to delete Person
 app.delete('/participants', function (req, res) {
-  const deletePerson = req.body
-  Person.findOneAndRemove({name: deletePerson.name}, (err, doc) => {
-    if (err) return console.error(err)
-    if (doc) {
-      console.log('person deleted')
-      res.status(200).end()
-    } else {
-      res.status(404).send('Not Found')
-    }
-  })
+  Person.findOneAndRemove(
+    { name: req.body.name },
+    (err, doc) => {
+      if (err) return console.error(err)
+      if (doc) {
+        console.log('person deleted')
+        res.status(200).end()
+      } else {
+        res.status(404).send('Not Found')
+      }
+    })
 })
 
 export default app
