@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "npm run build && npm run start-server",
-    "start-server": "node dist/server.js",
+    "start-server": "node dist/bootstrap.js",
     "build": "babel src --out-dir dist --presets es2015 && cp src/data.json dist/data.json",
     "babel-node": "babel-node --presets es2015 --ignore='foo|bar|baz'",
     "test": "standard && npm run test:cover",
@@ -23,8 +23,10 @@
     "babel-preset-es2015": "^6.1.18",
     "express": "^4.13.3",
     "express-api-queryhandler": "^0.4.2",
+    "forever": "^0.15.1",
     "lodash.includes": "^3.1.3",
-    "lodash.pick": "^3.1.0"
+    "lodash.pick": "^3.1.0",
+    "pm2": "^0.15.10"
   },
   "devDependencies": {
     "babel-istanbul": "^0.5.9",
