@@ -15,6 +15,7 @@ pm2.connect(function () {
     instances: instances,
     max_memory_restart: maxMemory + 'M',   // Auto restart if process taking more than XXmo
     env: {                            // If needed declare some environment variables
+      'NODE_ENV': process.env.PORT
     },
     post_update: ['npm install']       // Commands to execute once we do a pull from Keymetrics
   }, function () {
