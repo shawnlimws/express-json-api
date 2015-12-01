@@ -28,7 +28,7 @@ app.get('/', function (req, res) {
 
 app.get('/participants', function (req, res) {
   const query = req.query.name ? { name: { $regex: req.query.name, $options: 'i' } } : {}
-  const projection = req.query.filter ? req.query.filter.replace(/,/g, ' ') : null
+  const projection = req.query.filter ? '-_id ' + req.query.filter.replace(/,/g, ' ') : null
   const options = req.query.sort ? { sort: { name: 1 } } : null
   Person.find(query, projection, options, (err, docs) => {
     if (err) return console.err(err)
@@ -37,7 +37,7 @@ app.get('/participants', function (req, res) {
       res.json(docs)
     } else {
       console.log('Not Found')
-      res.status(404).send('Not Found')
+      res.status(404).end('Not Found')
     }
   })
 })
@@ -64,7 +64,7 @@ app.put('/participants', function (req, res) {
         console.log('person updated')
         res.json(doc)
       } else {
-        res.status(404).send('Not found')
+        res.status(404).end('Not found')
       }
     })
 })
@@ -79,7 +79,7 @@ app.delete('/participants', function (req, res) {
         console.log('person deleted')
         res.status(200).end()
       } else {
-        res.status(404).send('Not Found')
+        res.status(404).end('Not Found')
       }
     })
 })

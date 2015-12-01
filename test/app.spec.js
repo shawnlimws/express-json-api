@@ -1,16 +1,22 @@
 /* global describe it */
-
 import app from '../src/app.js'
 import chai from 'chai'
 import request from 'supertest'
-import querystring from 'querystring'
 
 const expect = chai.expect
 const NOT_FOUND = 404
 const OK = 200
 const REDIRECT_FOUND = 302
 
-describe('/GET method on /participants', () => {
+let testPerson = {
+  name: 'John Doe ' + Math.random().toString(),
+  title: 'Ghost',
+  age: Math.floor(Math.random()),
+  address: 'Some place in Singapore'
+}
+
+describe('/GET method on /participants', function () {
+  this.timeout(10000)
   it('should respond with JSON data', done => {
     request(app).get('/participants')
       .expect('Content-Type', /json/)
@@ -33,7 +39,8 @@ describe('/GET method on /participants', () => {
   })
 })
 
-describe('/GET /participants?name', () => {
+describe('/GET /participants?name', function () {
+  this.timeout(10000)
   it('should respond with participants whose name is in the URL', done => {
     request(app).get('/participants?name=albert')
       .expect(res => {
@@ -50,9 +57,10 @@ describe('/GET /participants?name', () => {
   })
 })
 
-describe('/GET /participants?sorted=true', () => {
-  it('should provide a response sorted by name if sorted is true', done => {
-    request(app).get('/participants?name=tan&sorted=true')
+describe('/GET /participants?sorted=true', function () {
+  this.timeout(10000)
+  it('should provide a response sorted by name if sort is true', done => {
+    request(app).get('/participants?name=tan&sort=true')
       .expect('Content-Type', /json/)
       .expect(res => {
         expect(res).to.satisfy(res => {
@@ -63,7 +71,8 @@ describe('/GET /participants?sorted=true', () => {
   })
 })
 
-describe('/GET /participants?filter=:keys', () => {
+describe('/GET /participants?filter=:keys', function () {
+  this.timeout(10000)
   it('should provide only whitelisted keys', done => {
     request(app).get('/participants?name=albert&filter=name,imagePath')
       .expect('Content-Type', /json/)
@@ -77,58 +86,53 @@ describe('/GET /participants?filter=:keys', () => {
 })
 
 // tests for CRUD
-describe('/POST method on /participants', () => {
+describe('/POST method on /participants', function () {
+  this.timeout(10000)
   const agent = request.agent(app)
-  const newPerson = {
-    name: 'John Doe',
-    title: 'Ghost',
-    age: 999,
-    address: 'The Working Capitol Annex 3'
-  }
-  const queryString = querystring.stringify(newPerson)
   it('should create a new person object and respond with the object', done => {
-    agent.post('/participants?' + queryString)
+    agent.post('/participants')
+      .send(testPerson)
       .expect('Content-Type', /json/)
       .expect(200)
       .expect(res => {
-        expect(res.body).to.deep.equal(newPerson)
+        for (const prop in testPerson) {
+          expect(res.body[prop]).to.equal(testPerson[prop])
+        }
       })
       .end(done)
   })
   it('should append the new person to the database', done => {
     agent.get('/participants')
       .expect(res => {
-        const testPerson = res.body.find(el => el.name === newPerson.name)
-        expect(testPerson).to.exist
-        for (const prop in newPerson) {
-          expect(testPerson[prop]).to.equal(newPerson[prop])
+        const newPerson = res.body.find(el => el.name === testPerson.name)
+        expect(newPerson).to.exist
+        for (const prop in testPerson) {
+          expect(newPerson[prop]).to.equal(testPerson[prop])
         }
       })
       .end(done)
   })
 })
 
-describe('/UPDATE method on /participants', () => {
+describe('/UPDATE method on /participants', function () {
+  this.timeout(10000)
   const agent = request.agent(app)
-  const updatePerson = {
-    name: 'Albert Salim',
-    title: 'Cyclist',
-    address: 'Keong Saik Road',
-    age: 1
-  }
-  const queryString = querystring.stringify(updatePerson)
-
+  testPerson.title = 'A really old guy'
   it('should return OK', done => {
-    agent.put('/participants?' + queryString)
+    agent.put('/participants')
+      .send(testPerson)
       .expect(OK)
       .end(done)
   })
+  testPerson.title = 'A toddler'
+  testPerson.age = 1
   it('should return a person with updated properties', done => {
-    agent.put('/participants?' + queryString)
+    agent.put('/participants')
+      .send(testPerson)
       .expect(res => {
-        expect(res.body).to.contain.all.keys(Object.keys(updatePerson))
-        for (const prop in updatePerson) {
-          expect(res.body[prop]).to.equal(updatePerson[prop])
+        expect(res.body).to.contain.all.keys(Object.keys(testPerson))
+        for (const prop in testPerson) {
+          expect(res.body[prop]).to.equal(testPerson[prop])
         }
       })
       .end(done)
@@ -136,29 +140,28 @@ describe('/UPDATE method on /participants', () => {
   it('should return a complete list of participants with new properties', done => {
     agent.get('/participants')
       .expect(res => {
-        const testPerson = res.body.find(el => el.name === updatePerson.name)
-        expect(testPerson).to.exist
-        for (const prop in updatePerson) {
-          expect(testPerson[prop]).to.equal(updatePerson[prop])
+        const updatePerson = res.body.find(el => el.name === testPerson.name)
+        expect(updatePerson).to.exist
+        for (const prop in testPerson) {
+          expect(updatePerson[prop]).to.equal(testPerson[prop])
         }
       })
       .end(done)
   })
   it('should return NOT FOUND if name is not found', done => {
-    agent.put('/participants?name=Unknown person')
+    agent.put('/participants')
+      .send({ name: 'Should not be there' })
       .expect(NOT_FOUND)
       .end(done)
   })
 })
 
-describe('/DELETE method on /participants', () => {
+describe('/DELETE method on /participants', function () {
+  this.timeout(10000)
   const agent = request.agent(app)
-  const deletePerson = {
-    name: 'Albert Salim'
-  }
   it('should return OK', done => {
-    agent.delete('/participants?name=' + deletePerson.name)
-      .expect('Content-Type', /json/)
+    agent.delete('/participants')
+      .send({ name: testPerson.name })
       .expect(OK)
       .end(done)
   })
@@ -168,12 +171,13 @@ describe('/DELETE method on /participants', () => {
       .expect(OK)
       .expect(res => {
         const names = res.body.map(person => person.name)
-        expect(names).to.not.contain(deletePerson.name)
+        expect(names).to.not.contain(testPerson.name)
       })
       .end(done)
   })
   it('should return NOT FOUND if name is not found', done => {
-    agent.delete('/participants?name=Not Found')
+    agent.delete('/participants')
+      .send({ name: 'Should not be there' })
       .expect(NOT_FOUND)
       .end(done)
   })
