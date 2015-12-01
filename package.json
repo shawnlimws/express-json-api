@@ -6,7 +6,7 @@
   "scripts": {
     "start": "npm run build && npm run start-server",
     "start-server": "node dist/server.js",
-    "build": "babel src --out-dir dist --presets es2015 && cp src/data.json dist/data.json",
+    "build": "babel src --out-dir dist --presets es2015",
     "babel-node": "babel-node --presets es2015 --ignore='foo|bar|baz'",
     "test": "standard && npm run test:cover",
     "test:cover": "babel-node node_modules/.bin/babel-istanbul cover _mocha",
