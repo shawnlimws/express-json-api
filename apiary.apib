@@ -1,0 +1,91 @@
+FORMAT: 1A
+HOST: https://express-json-api.herokuapp.com/
+
+# express-json-api
+
+Express-JSON-API is a simple demo API allowing users to interact with General Assembly Web Development Immersive Class List.
+
+## Participants Collection [/participants]
+
+### List All Participants [GET]
+
+You may get all participants using this action.
+
+
++ Response 200 (application/json)
+ 
+        [
+            {
+                "name": "Calvin Tan",
+                "title": "Student",
+                "imagePath": "img/calvin.jpg",
+                "githubURL": "https://github.com/yourGitHubUsername"
+            }, {
+                "name": "Tian",
+                "title": "Student",
+                "imagePath": "img/Tian.jpg",
+                "githubURL": "https://github.com/yourGitHubUsername"
+            }, {
+                "name": "Steve Tan",
+                "title": "Student",
+                "imagePath": "img/Steve.jpg",
+                "githubURL": "https://github.com/yourGitHubUsername"
+            }
+        ]
+
+### Create a New Participant [POST]
+
+You may create your own participant using this action. It takes a JSON object containing the details of the person.
+
++ Request (application/json)
+
+        {
+            name: 'John Doe',
+            title: 'Ghost',
+            age: 9999,
+            address: 'The Working Capitol Annex 3'
+        }
+
++ Response 200 (application/json)
+
+        {
+            "name": "John Doe",
+            "title": "Ghost",
+            "age": 9999,
+            "address": "The Working Capitol Annex 3"
+        }
+        
+### Update a Participant [PUT]
+
+You may update the details of a participant using this action. It takes a JSON object containing the full name of the person and the details to be updated.
+**Note: Person's name is case sensitive and must be exact match**
+
++ Request (application/json)
+
+        {
+            name: 'John Doe',
+            title: 'Toddler',
+            age: 1,
+        }
+
++ Response 200 (application/json)
+
+        {
+            "name": "John Doe",
+            "title": "Toddler",
+            "age": 1,
+            "address": "The Working Capitol Annex 3"
+        }
+
+### Delete a Participant [DELETE]
+
+You may remove a participant using this action. It takes a JSON object containing the full name of the person.
+**Note: Person's name is case sensitive and must be exact match**
+
++ Request (application/json)
+
+        {
+            name: 'John Doe'
+        }
+
++ Response 200 (application/json)
